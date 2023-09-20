@@ -1,12 +1,13 @@
 function handleError(err) {
     let msg = err.message;
     if (err && err.errors) {
+        // console.log("error occured here ----->>>> ", err);
         if (err.name && err.name == "SequelizeUniqueConstraintError") {
             let field = err['errors'][0]["path"].split("_").join(" ")
             if (field) {
                 let strr = field.split("_").join(" ");
                 let label = (strr.charAt(0).toUpperCase() + strr.slice(1))
-                msg = `${label} is already exists!`
+                msg = `${label} already exists!`
             } else {
                 msg = "Already exists!"
             }

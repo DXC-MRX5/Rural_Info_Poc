@@ -10,25 +10,25 @@ const User = (sequelize, Sequelize)=>{
         allowNull: false
     },
     mobile: {
-            type: Sequelize.STRING(10),
-            allowNull: false,
-            validate: {
-               async customValidator(value,next){
+        type: Sequelize.STRING(10),
+        allowNull: false,
+        validate: {
+            async customValidator(value,next){
                 try {
-                  const existingUser = await userModel.findOne({
+                    const existingUser = await userModel.findOne({
                         where: { mobile: value, id:{$ne: this.id}},
                         raw:true
-                  }); 
-              if (existingUser) {
-                   return next("Mobile number already has an account!");
-                }else{
-                  return next()
+                    }); 
+                    if (existingUser) {
+                        return next("Mobile number already has an account!");
+                    }else{
+                        return next()
+                    }
                 }
-                } catch (error) {
-                 return next(error)
+                catch (error) {
+                    return next(error)
                 }
-                
-               }
+            }
         }
     },
     password: {
