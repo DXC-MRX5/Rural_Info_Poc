@@ -1,8 +1,10 @@
 const router = require('express').Router();
-const {addRole, roleData, specificRoleData}=require("../controller/RoleDefination");
+const {addRole, getAllRole, specificRoleData, changeRoleDefination}=require("../controller/RoleDefination");
+const jwtAuthorizer = require('../middleware/JwtAuthorizer');
 
-router.post('/addRole', addRole);
-router.get('/allRoleData', roleData);
+router.post('/addRole', jwtAuthorizer, addRole);
+router.put('/changeRoleAccesses', jwtAuthorizer, changeRoleDefination);
+router.get('/allRoleData', getAllRole);
 router.get('/roleData', specificRoleData);
 
 module.exports = router;

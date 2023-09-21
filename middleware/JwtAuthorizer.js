@@ -4,7 +4,7 @@ const messages = require("../messages");
 const secretKey = process.env.SECRET_KEY;
 const moment = require("moment");
 
-const authorizer = (req, res, next) => {
+const jwtAuthorizer = (req, res, next) => {
   const receivedToken = req.headers["authorization"];
   if (!receivedToken) {
     return res.status(200).send({ message: messages.failure.unauthorizedUser });
@@ -13,6 +13,7 @@ const authorizer = (req, res, next) => {
   try {
     const validate = jwt.verify(token, secretKey);
     req.userInfo = validate;
+    console.log("getting this from jwtMiddleware ---->> ", validate);
   } catch (err) {
     let obj = {
       timestamp: moment().unix(),
@@ -24,4 +25,4 @@ const authorizer = (req, res, next) => {
   }
   next();
 };
-module.exports = authorizer;
+module.exports = jwtAuthorizer;

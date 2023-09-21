@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const dtbs = require("../config/config");
-const User = dtbs.users;
-const {userRegister, checkUserData, userLogin}=require("../controller/User");
-const authorizer = require('../middleware/JwtAuthorizer');
+const {userRegister, checkUserData, userLogin, changeUserRole}=require("../controller/User");
+const jwtAuthorizer = require('../middleware/JwtAuthorizer');
+const roleChecker = require('../middleware/Rolechecker');
 
 router.post('/registerUser', userRegister);
-router.get('/allUserData',authorizer, checkUserData);
+router.get('/allUserData', checkUserData);
 router.get('/loginUser', userLogin);
+router.put('/changeRole', jwtAuthorizer, roleChecker, changeUserRole);
 
 module.exports = router;

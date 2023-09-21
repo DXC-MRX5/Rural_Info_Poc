@@ -11,16 +11,18 @@ const { handleError } = require("../middleware/errorHandling");
 
 const userRegister = async (req, res) => {
   const receivedData = req.body;
-  const hashing = () => {
-    return (receivedData.password = bcrypt.hashSync(
-      receivedData.password,
-      saltRounds
-    ));
-  };
+  const passwordchecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if(!receivedData.password){
+    return res.send({message: messages.failure.emptyFields})
+  }
+  const strongPass = passwordchecker.test(receivedData.password);
+  if(!strongPass){
+    return res.send({message: messages.failure.weakPassword});
+  }
+  const hashedPassword = bcrypt.hashSync(receivedData.password, saltRounds);
+  receivedData.password = hashedPassword;
   try {
     const userCreation = await operation.createData(
-      [receivedData.password],
-      hashing,
       User,
       receivedData
     );
@@ -54,11 +56,10 @@ const checkUserData = async (req, res) => {
 };
 const userLogin = async (req, res) => {
   const loginData = req.body;
-  if(!loginData.password || !loginData.mobile){
-    return res.send({message: messages.failure.emptyFields});
+  if (!loginData.password || !loginData.mobile) {
+    return res.send({ message: messages.failure.emptyFields });
   }
   try {
-    
     // Checking the user existing or not.
     const userData = await operation.readSpecificData(
       User,
@@ -70,14 +71,25 @@ const userLogin = async (req, res) => {
     }
 
     // Checking the Password.
-    const isValidPassword = bcrypt.compareSync(loginData.password, userData.password)
-    if(!isValidPassword){
-      return res.send({message: messages.failure.wrongPassword})
+    const isValidPassword = bcrypt.compareSync(
+      loginData.password,
+      userData.password
+    );
+    if (!isValidPassword) {
+      return res.send({ message: messages.failure.wrongPassword });
     }
 
     // Generating a JWT token.
-    const token = jwt.sign({userId: userData.id, role: userData.roleId}, process.env.SECRET_KEY, {expiresIn: "12h"})
-    return res.send({message:messages.success.userLogin, Token:token, userName: userData.userName});
+    const token = jwt.sign(
+      { userId: userData.id, role: userData.roleId },
+      process.env.SECRET_KEY,
+      { expiresIn: "12h" }
+    );
+    return res.send({
+      message: messages.success.userLogin,
+      Token: token,
+      userName: userData.userName,
+    });
   } catch (err) {
     let obj = {
       timestamp: moment().unix(),
@@ -89,6 +101,24 @@ const userLogin = async (req, res) => {
   }
 };
 
-const changeUserRole = "hsdfuighihu";
+const changeUserRole = async (req, res)=>{
+  const roleData = req.userInfo
+  const receivedData = req.body;
+  if(!receivedData.id || !receivedData.newroleId){
+    return res.send({message: messages.failure.emptyFields});
+  }
+  try{
+    const updatedData = await operation.updateSpecificData(User, "id", receivedData.id, "roleId", receivedData.newroleId);
+    return res.send({message: messages.success.roleUpdate, data: updatedData});
+  } catch (err) {
+    let obj = {
+      timestamp: moment().unix(),
+      status: 400,
+      message: messages.failure.failToReadData,
+      err: {},
+    };
+    return res.send(obj);
+  }
+};
 
-module.exports = { userRegister, checkUserData, userLogin };
+module.exports = { userRegister, checkUserData, userLogin, changeUserRole };
