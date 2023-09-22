@@ -1,6 +1,6 @@
 const District = (sequelize, Sequelize) =>{
     const districtModel  = sequelize.define('districts', {
-        districtId: {
+        id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true

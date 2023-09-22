@@ -98,12 +98,45 @@ Object.keys(dtbs).forEach((modelName) => {
 
 // Sync all models in the folder
 sequelize
-  .sync({alter:true})
+  .sync({alter:false})
   .then(() => {
     console.log("synced to respective Table.");
   })
   .catch((err) => {
     console.log("error in syncing to tables", err);
   });
+
+// Managing Relationships between Models.
+
+
+// ono-to-many relation between State and District
+dtbs.states.hasMany(dtbs.districts,{
+  foreignKey: "stateId",
+  as: 'DistrictInformations'
+})
+dtbs.districts.belongsTo(dtbs.states, {
+  foreignKey: "stateId",
+  as: "StateInformations"
+})
+
+// ono-to-many relation between District and Village
+dtbs.districts.hasMany(dtbs.villeges,{
+  foreignKey: "districtId",
+  as: 'VillageInformations'
+})
+dtbs.villeges.belongsTo(dtbs.districts, {
+  foreignKey: "districtId",
+  as: "DistrictInformations"
+})
+
+// ono-to-many relation between District and Village
+dtbs.users.hasOne(dtbs.Role_definations, {
+  foreignKey: "roleId",
+  as: "roleInformation"
+})
+dtbs.Role_definations.belongsTo(dtbs.users, {
+  foreignKey: "roleId",
+  as: "userInformation"
+})
 
 module.exports = dtbs;

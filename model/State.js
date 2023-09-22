@@ -1,16 +1,12 @@
 const State = (sequelize, Sequelize) => {
     const stateModel = sequelize.define('states', {
-        stateId: {
+        id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
         name: {
             type: Sequelize.STRING,
-            allowNull: false
-        },
-        districtsCount: {
-            type: Sequelize.INTEGER,
             allowNull: false
         }
     })

@@ -42,8 +42,9 @@ const getAllRole = async (req,res)=>{
 
 const specificRoleData = async (req,res)=>{
     const receivedData = req.body;
+    const credinals = {where: receivedData};
     try {
-        const RoleData = await operation.readSpecificData(Role, "roleId", receivedData.roleId);
+        const RoleData = await operation.readSpecificData(Role, credinals);
         console.log("getting this from role checking ----", RoleData.Role_definations);
         return res.send(RoleData);
       } catch (err) {

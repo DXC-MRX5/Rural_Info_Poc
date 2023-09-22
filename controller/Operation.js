@@ -11,25 +11,31 @@ module.exports = {
     });
   },
 
-  readAllData: (modelName) => {
+  readAllData: (modelName, inclution) => {
+    if(!inclution){
+      return new Promise(async (resolve, reject) => {
+        try {
+          const getAllData = await modelName.findAll({});
+          resolve(getAllData);
+        } catch (err) {
+          return reject(err);
+        }
+      })
+    }
     return new Promise(async (resolve, reject) => {
       try {
-        const getAllData = await modelName.findAll({});
+        const getAllData = await modelName.findAll(inclution);
         resolve(getAllData);
       } catch (err) {
         return reject(err);
       }
-    });
+    })
   },
 
-  readSpecificData: (modelName, whatToMatch, whomeToMatch) => {
+  readSpecificData: (modelName, condition) => {
     return new Promise(async (resolve, reject) => {
-      let condition = {
-        [whatToMatch]: whomeToMatch,
-      };
-      console.log("printing dynamic condition ----", condition);
       try {
-        const getData = await modelName.findOne({ where: condition });
+        const getData = await modelName.findOne(condition);
         resolve(getData);
       } catch (err) {
         return reject(err);

@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dtbs = require("../config/config");
 const User = dtbs.users;
+const RoleModel = dtbs.Role_definations;
 const operation = require("./Operation");
 const saltRounds = 12;
 const messages = require("../messages");
@@ -54,17 +55,41 @@ const checkUserData = async (req, res) => {
     return res.send(obj);
   }
 };
+
+const checkUser = async (req, res) => {
+  const receivedData = req.body;
+  const query = {
+    include: [{
+      model: RoleModel,
+      as: "roleInformation" 
+    }],
+    where: receivedData
+  }
+  try {
+    const userAllData = await operation.readSpecificData(User, query);
+    return res.send(userAllData);
+  } catch (err) {
+    let obj = {
+      timestamp: moment().unix(),
+      status: 400,
+      message: messages.failure.failToReadData,
+      err: {},
+    };
+    return res.send(obj);
+  }
+};
+
 const userLogin = async (req, res) => {
   const loginData = req.body;
   if (!loginData.password || !loginData.mobile) {
     return res.send({ message: messages.failure.emptyFields });
   }
+  const credinals = {where:{mobile: loginData.mobile}}
   try {
     // Checking the user existing or not.
     const userData = await operation.readSpecificData(
       User,
-      "mobile",
-      loginData.mobile
+      credinals
     );
     if (!userData) {
       return res.send({ message: messages.failure.newUserLogin });
@@ -102,13 +127,9 @@ const userLogin = async (req, res) => {
 };
 
 const changeUserRole = async (req, res)=>{
-  const roleData = req.userInfo
   const receivedData = req.body;
-  if(!receivedData.id || !receivedData.newroleId){
-    return res.send({message: messages.failure.emptyFields});
-  }
   try{
-    const updatedData = await operation.updateSpecificData(User, "id", receivedData.id, "roleId", receivedData.newroleId);
+    const updatedData = await operation.updateSpecificData(User, "id", receivedData[0].id, receivedData[1]);
     return res.send({message: messages.success.roleUpdate, data: updatedData});
   } catch (err) {
     let obj = {
@@ -121,4 +142,4 @@ const changeUserRole = async (req, res)=>{
   }
 };
 
-module.exports = { userRegister, checkUserData, userLogin, changeUserRole };
+module.exports = { userRegister, checkUserData, userLogin, changeUserRole, checkUser };

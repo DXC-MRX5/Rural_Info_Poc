@@ -8,6 +8,7 @@ require("./config/config");
 // const role_model = require("./model/RoleDefination");
 const userRouter = require("./routes/UserRouter")
 const roleRouter = require("./routes/RoleRouter")
+const crdntrouter = require("./routes/Coordinate")
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,7 @@ app.get('/home', (req, res)=>{
 })
 app.use('/api', userRouter);
 app.use('/api', roleRouter);
+app.use('/api', crdntrouter);
 
 app.listen(port, ()=>{
     console.log("server is running on the port - ",port);
